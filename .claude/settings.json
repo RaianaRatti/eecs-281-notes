@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pdftotext /Users/raiana/codes/umich/classes/eecs-281/notes/EECS281-Chapter-1-Programming-Foundations-Notes.pdf -)"
+    ]
+  }
+}
