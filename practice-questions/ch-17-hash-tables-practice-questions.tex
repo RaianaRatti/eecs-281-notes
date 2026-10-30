@@ -1,0 +1,353 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{titlesec}
+
+\definecolor{pastc}{HTML}{1F4E9A}
+\definecolor{newc}{HTML}{1E7A3C}
+\newcommand{\pasttag}{\colorbox{pastc}{\textcolor{white}{\scriptsize\textbf{\,PAST MIDTERM (EXACT)\,}}}}
+\newcommand{\newtag}{\colorbox{newc}{\textcolor{white}{\scriptsize\textbf{\,NEW (PAST-EXAM PATTERN)\,}}}}
+\newcommand{\X}{\texttt{X}}
+
+\lstset{language=C++, basicstyle=\ttfamily\small, columns=fullflexible,
+  keepspaces=true, showstringspaces=false, numbers=left, numberstyle=\tiny\color{gray},
+  xleftmargin=2em, frame=single, framerule=0.3pt, rulecolor=\color{gray}}
+
+\setlist[enumerate]{label=\Alph*), itemsep=1pt, topsep=3pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\titleformat{\section}{\large\bfseries}{}{0pt}{}
+\newcounter{q}
+\newcommand{\question}[2]{\vspace{8pt}\refstepcounter{q}\textbf{\arabic{q}. #1}\hfill #2\par}
+\newcommand{\answer}[1]{\par\vspace{6pt}\textbf{#1.}~}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries EECS 281 Practice Midterm: Chapter 17}\\[3pt]
+{\large Hash Tables and Collision Resolution}\\[3pt]
+{\small Modeled on the Fall 2026 Exam 2 Practice (Darden, Paoletti)}
+\end{center}
+
+\textbf{Instructions.} Select only ONE answer per multiple-choice question. For written questions, follow the
+line limits and complexity requirements. When asked about memory complexity, consider all possible sources (stack and heap).
+Questions marked \pasttag\ are copied word-for-word from the practice exam. Questions marked \newtag\ are new and follow the same patterns.
+Answers start on the page after the questions.
+
+%==========================================================
+\section*{Part I: Past Midterm Questions}
+
+\question{Collision Resolution}{\pasttag}
+You are given a hash table with size $M = 10$ and hash function $H(n) = (2n + 3) \bmod M$. Collisions
+are resolved using quadratic probing. What would the table look like (with an \X\ denoting an empty
+location) after inserting the following elements in the order given? Use $c_1 = 0$ and $c_2 = 1$.
+
+\centerline{\texttt{4, 10, 12, 7, 2}}
+\begin{enumerate}
+  \item \texttt{[X, 4, X, 10, X, X, X, 12, 7, 2]}
+  \item \texttt{[X, 4, 2, 10, X, X, X, 12, 7, X]}
+  \item \texttt{[X, 4, X, 10, X, X, 2, 12, 7, X]}
+  \item \texttt{[X, 4, X, 10, X, X, 2, 12, X, 7]}
+\end{enumerate}
+
+\question{Hash Table Applications}{\pasttag}
+In which one of the following situations would you want to use a hash table?
+\begin{enumerate}
+  \item You have a classroom full of students each with a 10-digit ID number, and you want to find them by their ID number.
+  \item You want to find the highest priority thread to execute, each with its own assigned priority.
+  \item You have a rectangular floor composed of square tiles, and you want to know the color of a tile given a set of coordinates.
+  \item You are given a set of names, and want to print them out in alphabetical order.
+\end{enumerate}
+
+\question{Programming: Searching in a Hash Table [12 Points]}{\pasttag}
+A set is a data structure that can efficiently (less than $O(n)$ time) see if it contains a given element. Given
+the following definition of a hash table structure:
+\begin{lstlisting}[numbers=none]
+enum class Status { Empty, Occupied, Deleted };
+struct HashTable {
+  std::vector<int> buckets;
+  std::vector<Status> status;
+};
+\end{lstlisting}
+Suppose this hash table implements the quadratic probing mechanism for collision resolution. When
+hashing an integer value \texttt{val}, the hash function is simply \texttt{val \% M}, where \texttt{M} represents the size of the
+hash table. Implement the \texttt{exists()} function for a set based on a hash table. Use $c_1 = 1$ and $c_2 = 2$.
+
+\textit{Requirements:} Your solution must implement quadratic probing. Your solution must be $O(n)$ time. You
+may use $O(1)$ auxiliary space.\par \textit{Implementation:} Use the back of this page as a working area, then rewrite neatly on the front. \textit{Limit:} 16 lines of code (points deducted if longer). You may use any C, C++, or STL function/algorithm that you wish.
+\begin{lstlisting}[numbers=none]
+bool exists(const HashTable &tbl, int val) {
+\end{lstlisting}
+
+%==========================================================
+\section*{Part II: New Questions (Same Patterns)}
+
+\question{Hash Function Properties}{\newtag}
+Which one of the following is \textbf{NOT} a valid hash function for \texttt{std::string} keys? (Two strings with equal contents are the same key.)
+\begin{enumerate}
+  \item \texttt{return 0;}
+  \item \texttt{return s.size() * 31;}
+  \item \texttt{return reinterpret\_cast<size\_t>(\&s);} \quad (the memory address of the string object)
+  \item \texttt{return std::accumulate(s.begin(), s.end(), size\_t\{0\});} \quad (the sum of the characters)
+\end{enumerate}
+
+\question{Compression and Table Size}{\newtag}
+A hash table uses division compression, $\text{index} = K \bmod M$, with $M = 15$. Every key $K$ that will
+ever be inserted is a non-negative multiple of 6. How many distinct indices can these keys ever map to?
+\begin{enumerate}
+  \item 15
+  \item 3
+  \item 5
+  \item 6
+  \item 1
+\end{enumerate}
+
+\question{Linear Probing with Deletion}{\newtag}
+A hash table of size $M = 10$ uses hash function $H(n) = (3n + 1) \bmod M$ and resolves collisions with linear
+probing. Duplicates are not allowed, and erased elements are replaced with a deleted flag (\texttt{DEL}). What does
+the table look like after the following operations, in order?
+
+\centerline{\texttt{insert 3, insert 13, insert 23, insert 6, erase 13, insert 23, insert 33, erase 3, insert 16}}
+\begin{enumerate}
+  \item \texttt{[DEL, DEL, 23, 33, 16, X, X, X, X, 6]}
+  \item \texttt{[16, 23, 23, 33, X, X, X, X, X, 6]}
+  \item \texttt{[16, DEL, 23, 33, X, X, X, X, X, 6]}
+  \item \texttt{[16, 33, 23, X, X, X, X, X, X, 6]}
+\end{enumerate}
+
+\question{Quadratic Probing}{\newtag}
+You are given a hash table with size $M = 11$ and hash function $H(n) = (3n + 2) \bmod M$. Collisions are resolved
+using quadratic probing, where the $i$-th probe ($i = 0, 1, 2, \dots$) checks index $(H(n) + c_1 i + c_2 i^2) \bmod M$.
+Use $c_1 = 1$ and $c_2 = 1$. What would the table look like after inserting the following elements in the order given?
+
+\centerline{\texttt{5, 16, 27, 3, 14}}
+\begin{enumerate}
+  \item \texttt{[3, 14, X, X, X, X, 5, 16, 27, X, X]}
+  \item \texttt{[3, 27, 14, X, X, X, 5, X, 16, X, X]}
+  \item \texttt{[3, 14, X, X, X, X, 5, 16, X, X, 27]}
+  \item \texttt{[3, X, 14, 27, X, X, 5, X, 16, X, X]}
+\end{enumerate}
+
+\question{Double Hashing}{\newtag}
+A hash table of size $M = 11$ uses double hashing. The $j$-th probe ($j = 0, 1, 2, \dots$) for key $k$ checks index
+$(h_1(k) + j \cdot h_2(k)) \bmod M$, where $h_1(k) = k \bmod 11$ and $h_2(k) = 5 - (k \bmod 5)$.
+What does the table look like after inserting the following keys in the order given?
+
+\centerline{\texttt{14, 25, 36, 3, 58}}
+\begin{enumerate}
+  \item \texttt{[X, X, X, 14, X, 3, X, 36, 25, 58, X]}
+  \item \texttt{[X, X, X, 14, 25, 36, 3, 58, X, X, X]}
+  \item \texttt{[58, X, X, 14, X, 25, X, 36, X, 3, X]}
+  \item \texttt{[X, X, X, 14, X, 3, 58, 36, 25, X, X]}
+\end{enumerate}
+
+\question{Dynamic Hashing}{\newtag}
+An open-addressing hash table starts with $M = 4$, uses $H(k) = k \bmod M$ (where $M$ is the \emph{current} size),
+and resolves collisions with linear probing. After each insertion, if the load factor $\alpha > 0.5$, the table is
+doubled and every key is rehashed into the new table, scanning the old table from index $0$ to $M-1$.
+What does the table look like after inserting \texttt{9, 17, 6, 14} in that order?
+\begin{enumerate}
+  \item \texttt{[X, 9, 17, 6, X, X, 14, X]}
+  \item \texttt{[X, 9, 17, X, X, X, 6, 14]}
+  \item \texttt{[14, 9, 17, 6]}
+  \item \texttt{[X, 9, 17, X, X, X, 14, 6]}
+\end{enumerate}
+
+\question{Collision Resolution Facts}{\newtag}
+Which of the following statements about hash tables is TRUE?
+\begin{enumerate}
+  \item Slots holding a deleted flag count toward $N$ when computing the load factor $\alpha = N/M$.
+  \item With quadratic probing, an insert always finds an open slot as long as at least one slot in the table is empty.
+  \item When a hash table is resized, each element can be copied to the same index in the new, larger table.
+  \item Double hashing reduces secondary clustering because keys that hash to the same index can follow different probe sequences.
+  \item In a hash table using separate chaining, the load factor $\alpha$ can never exceed 1.
+\end{enumerate}
+
+\question{Hash Table Applications}{\newtag}
+In which one of the following situations would a hash table be the best choice?
+\begin{enumerate}
+  \item You want to list every employee whose salary is between \$50{,}000 and \$80{,}000.
+  \item A website receives 10 million sign-ups and must check, for each one, whether that username is already taken.
+  \item You repeatedly need to remove the job with the earliest deadline from a set of jobs.
+  \item You need to look up the name of the weekday for an integer from 0 to 6.
+  \item You want to print every distinct word in a book in alphabetical order.
+\end{enumerate}
+
+\question{STL Unordered Map}{\newtag}
+What does the following code print?
+\begin{lstlisting}
+std::unordered_map<std::string, int> m;
+m["eecs"] = 281;
+m.insert({"eecs", 370});
+m.insert({"math", 217});
+if (m.find("stats") == m.end())
+  m.emplace("stats", 250);
+if (m["phys"] > 0)
+  m["eecs"] = 482;
+m.erase("math");
+std::cout << m.size() << " " << m["eecs"] << " " << m.count("phys");
+\end{lstlisting}
+\begin{enumerate}
+  \item \texttt{2 281 0}
+  \item \texttt{3 281 1}
+  \item \texttt{3 370 1}
+  \item \texttt{4 281 1}
+  \item \texttt{2 482 0}
+\end{enumerate}
+
+\question{Programming: Inserting into a Hash Table [12 Points]}{\newtag}
+Use the same \texttt{Status} and \texttt{HashTable} definitions as Question 3. The table now resolves collisions with
+\textbf{double hashing}: the $j$-th probe ($j = 0, 1, 2, \dots$) for \texttt{val} checks index
+$(h_1 + j \cdot h_2) \bmod M$, where $h_1 = $ \texttt{val \% M} and $h_2 = 7 - $ \texttt{(val \% 7)}.
+Assume all values are non-negative and $M$ is a prime greater than 7.
+
+Implement \texttt{insert()}. The table does not allow duplicates: if \texttt{val} is already in the table, return \texttt{false}
+and change nothing. Otherwise, store \texttt{val} in the \emph{first} \texttt{Deleted} or \texttt{Empty} slot along its probe
+sequence and return \texttt{true}. If there is no such slot, return \texttt{false}.
+
+\textit{Requirements:} $O(n)$ time, $O(1)$ auxiliary space. \textit{Limit:} 18 lines of code.
+\begin{lstlisting}[numbers=none]
+bool insert(HashTable &tbl, int val) {
+\end{lstlisting}
+
+\question{Programming: Counting Pair Sums [8 Points]}{\newtag}
+Given a vector of integers \texttt{nums} and an integer \texttt{target}, return the number of index pairs $(i, j)$ with
+$i < j$ and \texttt{nums[i] + nums[j] == target}. For example, \texttt{nums = [1, 5, 3, 3, 3]} and \texttt{target = 6} returns
+\texttt{4}: the pair $(1, 5)$ plus three pairs of 3s. The input is not sorted.
+
+\textit{Requirements:} average-case $O(n)$ time; you may use $O(n)$ auxiliary space. \textit{Limit:} 12 lines of code.
+You may use any C, C++, or STL function/algorithm that you wish.
+\begin{lstlisting}[numbers=none]
+size_t count_pairs(const std::vector<int> &nums, int target) {
+\end{lstlisting}
+
+\newpage
+%==========================================================
+\section*{Answer Key}
+
+\answer{1}\textbf{C} \texttt{[X, 4, X, 10, X, X, 2, 12, 7, X]}.
+$H$: $4\to1$, $10\to3$, $12\to7$, $7\to7$. 7 collides at 7, so it probes $7+1^2 = 8$. Then 2 hashes to 7: it probes 8 (taken),
+$7+4 = 11 \to 1$ (taken), and $7+9 = 16 \to 6$ (empty).
+
+
+\answer{2}\textbf{A}. Looking up students by a sparse 10-digit key is the textbook hash table use.
+B is a priority queue, C is direct addressing (a 2-D array), and D needs sorted order (sort it or use a BST).
+
+
+\answer{3}Probe $i$ checks \texttt{(val \% M + 1*i + 2*i*i) \% M}. Stop with \texttt{false} at an \texttt{Empty} slot. Skip
+\texttt{Deleted} slots. Return \texttt{true} on an \texttt{Occupied} slot that holds \texttt{val}. Cap the loop at $M$ probes so it is $O(n)$.
+\begin{lstlisting}
+bool exists(const HashTable &tbl, int val) {
+  size_t M = tbl.buckets.size();
+  size_t h = static_cast<size_t>(val) % M;   // assumes val >= 0
+  for (size_t i = 0; i < M; ++i) {
+    size_t idx = (h + i + 2 * i * i) % M;
+    if (tbl.status[idx] == Status::Empty) return false;
+    if (tbl.status[idx] == Status::Occupied && tbl.buckets[idx] == val)
+      return true;
+  }
+  return false;
+}
+\end{lstlisting}
+Common mistakes: stopping at a \texttt{Deleted} slot, or looping forever when the table has no \texttt{Empty} slot.
+
+
+\answer{4}\textbf{C}. A hash function must be deterministic: equal keys must always give the same hash. Two different
+\texttt{std::string} objects holding the same text have different addresses, so you could never find the key again.
+A (always 0) is valid but terrible, B and D are valid (equal strings give equal results), though they collide often.
+
+
+\answer{5}\textbf{C} (5). $K = 6m$ shares the factor $\gcd(6, 15) = 3$ with $M$, so every index is a multiple of 3: $\{0, 3, 6, 9, 12\}$.
+This is why $M$ should be prime: with $M = 17$, all 17 indices could be used.
+
+
+\answer{6}\textbf{D} \texttt{[16, 33, 23, X, X, X, X, X, X, 6]}.
+$H$: $3, 13, 23, 33 \to 0$ and $6, 16 \to 9$. The first four inserts give \texttt{[3, 13, 23, X, \dots, 6]}.
+Erase 13 marks slot 1 \texttt{DEL}. Insert 23 probes 0, 1 (\texttt{DEL}, keep going), 2 (hit), so there is no insert.
+Insert 33 probes 0, 1, 2, then stops at empty slot 3. It is not present, so it goes into the first \texttt{DEL}/empty slot seen, which is 1.
+Erase 3 marks slot 0 \texttt{DEL}. Insert 16 probes 9, wraps to 0 (\texttt{DEL}), 1, 2, then stops at empty slot 3 and goes into slot 0.
+(B is what you get by emptying slots instead of using \texttt{DEL}. A comes from inserting at the first \emph{empty} slot and never reusing \texttt{DEL}. C reuses a \texttt{DEL} slot for 16 but not for 33.)
+
+
+\answer{7}\textbf{B} \texttt{[3, 27, 14, X, X, X, 5, X, 16, X, X]}.
+With $c_1 = c_2 = 1$ the probe offsets are $0, 2, 6, 12, \dots$.
+$H$: $5, 16, 27 \to 6$ and $3, 14 \to 0$. 5 goes to 6. 16 goes to $6+2 = 8$. 27 tries 6 and 8, then $6+6 = 12 \to 1$.
+3 goes to 0. 14 goes to $0+2 = 2$. (A is linear probing, and C uses $c_1 = 0$.)
+
+
+\answer{8}\textbf{A} \texttt{[X, X, X, 14, X, 3, X, 36, 25, 58, X]}.
+Every key has $h_1 = 3$. 14 goes to 3.
+25: $h_2 = 5$, so it lands at 8. 36: $h_2 = 4$, so it lands at 7. 3: $h_2 = 2$, so it lands at 5.
+58: $h_2 = 2$, so it tries 5 and 7 (both taken), then lands at 9.
+(B is linear probing. C uses $h_1$ instead of the key to compute $h_2$.)
+
+
+\answer{9}\textbf{B} \texttt{[X, 9, 17, X, X, X, 6, 14]}.
+With $M = 4$: 9 goes to 1, and 17 goes to 2 ($\alpha = 0.5$, so no resize). 6 goes to 3, so $\alpha = 0.75 > 0.5$ and the table resizes to $M = 8$.
+Rehashing gives 9 at 1, 17 at 1 then 2, and 6 at 6. Then 14 maps to 6 (taken), so it goes to 7, and $\alpha = 0.5$ means no resize.
+(A copies slots without rehashing, and C never resizes.)
+
+
+\answer{10}\textbf{D}. A is false: deleted flags do not count toward $N$. B is false: quadratic probing only reaches about half the slots
+and can cycle forever when $\alpha > \tfrac12$. C is false: indices depend on $M$, so every key must be rehashed. E is false: with chaining,
+$\alpha$ is the average list length and can exceed 1.
+
+
+\answer{11}\textbf{B}. A membership check (``have I seen this?'') on a huge key space runs in average $\Theta(1)$ with \texttt{unordered\_set}.
+A is a range query (a sorted structure or BST). C is a priority queue. D is direct addressing (a plain array). E needs sorted order.
+
+
+\answer{12}\textbf{B} \texttt{3 281 1}. \texttt{insert} never overwrites, so \texttt{"eecs"} stays 281. \texttt{"stats"} is added by \texttt{emplace}.
+\texttt{m["phys"]} \emph{inserts} \texttt{\{"phys", 0\}}, and $0 > 0$ is false, so 482 is never assigned. After erasing \texttt{"math"} the keys are
+eecs, stats, and phys, so the size is 3. \texttt{count("phys")} is 1.
+
+
+\answer{13}Probe like a search. Return \texttt{false} on a hit. Remember the first non-\texttt{Occupied} slot, and stop at the first \texttt{Empty} slot
+(the key cannot be past it). Because $M$ is prime and $1 \le h_2 \le 7 < M$, the $M$ probes visit every slot exactly once.
+\begin{lstlisting}
+bool insert(HashTable &tbl, int val) {
+  size_t M = tbl.buckets.size();
+  size_t h1 = val % M, h2 = 7 - (val % 7);
+  size_t spot = M;                              // M = no free slot seen yet
+  for (size_t j = 0; j < M; ++j) {
+    size_t idx = (h1 + j * h2) % M;
+    if (tbl.status[idx] == Status::Occupied) {
+      if (tbl.buckets[idx] == val) return false;   // duplicate
+    } else {
+      if (spot == M) spot = idx;                  // first Deleted/Empty
+      if (tbl.status[idx] == Status::Empty) break; // val can't be later
+    }
+  }
+  if (spot == M) return false;                    // table full
+  tbl.buckets[spot] = val;
+  tbl.status[spot] = Status::Occupied;
+  return true;
+}
+\end{lstlisting}
+Common mistakes: inserting into the first \texttt{Deleted} slot without first checking the rest of the sequence for a duplicate,
+or stopping the search at a \texttt{Deleted} slot.
+
+
+\answer{14}Store a count of each value seen so far. For each element \texttt{x}, every earlier copy of \texttt{target - x} forms one pair.
+This is two-sum (Example 17.7) with counting. It runs in average $\Theta(n)$ time and $O(n)$ space. Using \texttt{find} keeps the lookup from inserting
+unneeded keys.
+\begin{lstlisting}
+size_t count_pairs(const std::vector<int> &nums, int target) {
+  std::unordered_map<int, size_t> seen;   // value -> times seen so far
+  size_t pairs = 0;
+  for (int x : nums) {
+    auto it = seen.find(target - x);
+    if (it != seen.end()) pairs += it->second;
+    ++seen[x];
+  }
+  return pairs;
+}
+\end{lstlisting}
+Trace on \texttt{[1, 5, 3, 3, 3]} with target 6: $0 \to 1$ (pair 1, 5) $\to 1 \to 2 \to 4$. Incrementing \texttt{seen[x]} \emph{after} the lookup is
+what keeps $i < j$, so an element never pairs with itself. A nested loop would be $\Theta(n^2)$ and lose points.
+
+
+\end{document}
